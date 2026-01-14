@@ -1,0 +1,10 @@
+const sessionService = require("../services/sessionService");
+
+module.exports = (ctx) => {
+  if (!sessionService.isLoggedIn(ctx.from.id)) {
+    return ctx.reply("⚠️ Bạn cần đăng nhập trước! (/login)");
+  }
+
+  const username = sessionService.getSession(ctx.from.id);
+  ctx.reply(`🔑 Đây là nội dung bí mật dành cho ${username}!`);
+};
