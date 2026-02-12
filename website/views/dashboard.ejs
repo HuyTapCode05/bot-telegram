@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Telegram Bot Manager</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <%- include('partials/navbar', { active: 'dashboard' }) %>
+
+    <main class="main-content">
+        <div class="dashboard">
+            <div class="page-header">
+                <h1><i class='bx bx-home'></i> Dashboard</h1>
+                <p>Thống kê và tổng quan bot</p>
+            </div>
+
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #3b82f6;">
+                        <i class='bx bx-message-rounded'></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="totalMessages">-</h3>
+                        <p>Tổng tin nhắn</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #10b981;">
+                        <i class='bx bx-group'></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="totalChats">-</h3>
+                        <p>Tổng nhóm</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #f59e0b;">
+                        <i class='bx bx-user'></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="totalUsers">-</h3>
+                        <p>Tổng người dùng</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #ef4444;">
+                        <i class='bx bx-bot'></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 id="botStatus">-</h3>
+                        <p>Trạng thái bot</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class='bx bx-info-circle'></i> Thông tin Bot</h2>
+                    </div>
+                    <div class="card-body">
+                        <% if (typeof botInfo !== 'undefined' && botInfo) { %>
+                        <div class="info-item">
+                            <span class="info-label">Tên bot:</span>
+                            <span class="info-value"><%= botInfo.first_name || 'N/A' %></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Username:</span>
+                            <span class="info-value">@<%= botInfo.username || 'N/A' %></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">ID:</span>
+                            <span class="info-value"><%= botInfo.id || 'N/A' %></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Có thể tham gia nhóm:</span>
+                            <span class="info-value"><%= botInfo.can_join_groups ? 'Có' : 'Không' %></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Có thể đọc tin nhắn:</span>
+                            <span class="info-value"><%= botInfo.can_read_all_group_messages ? 'Có' : 'Không' %></span>
+                        </div>
+                        <% } else { %>
+                        <p class="error">Không thể lấy thông tin bot</p>
+                        <% } %>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class='bx bx-bar-chart-alt-2'></i> Thống kê nhóm</h2>
+                    </div>
+                    <div class="card-body">
+                        <div id="chatStatsList">
+                            <p class="loading">Đang tải...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/common.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+        try {
+            const res = await fetch('/api/bot/stats');
+            const data = await res.json();
+            
+            if (data.success) {
+                document.getElementById('totalMessages').textContent = data.data.totalMessages.toLocaleString();
+                document.getElementById('totalChats').textContent = data.data.totalChats.toLocaleString();
+                
+                const totalUsers = data.data.chatStats.reduce(function(sum, chat) {
+                    return sum + chat.userCount;
+                }, 0);
+                document.getElementById('totalUsers').textContent = totalUsers.toLocaleString();
+                
+                const chatStatsList = document.getElementById('chatStatsList');
+                if (data.data.chatStats.length > 0) {
+                    chatStatsList.innerHTML = data.data.chatStats.slice(0, 10).map(function(chat) {
+                        return '<div class="chat-stat-item"><div class="chat-stat-info"><strong>Chat ID:</strong> ' + chat.chatId + '</div><div class="chat-stat-numbers"><span>' + chat.messageCount + ' tin nhắn</span> <span>' + chat.userCount + ' người dùng</span></div></div>';
+                    }).join('');
+                } else {
+                    chatStatsList.innerHTML = '<p>Chưa có dữ liệu</p>';
+                }
+            }
+        } catch (error) {
+            console.error('Error loading stats:', error);
+        }
+        
+        try {
+            const res = await fetch('/api/bot/info');
+            const data = await res.json();
+            document.getElementById('botStatus').textContent = data.success ? 'Đang hoạt động' : 'Lỗi';
+        } catch (error) {
+            document.getElementById('botStatus').textContent = 'Lỗi';
+        }
+    });
+    </script>
+</body>
+</html>

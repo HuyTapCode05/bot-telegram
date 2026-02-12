@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : 'Telegram Bot Manager' %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class='bx bx-bot'></i>
+                <span>Telegram Bot Manager</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/" class="nav-link <%= (typeof title !== 'undefined' && title === 'Dashboard') ? 'active' : '' %>">
+                    <i class='bx bx-home'></i> Dashboard
+                </a></li>
+                <li><a href="/manage-bot" class="nav-link <%= (typeof title !== 'undefined' && title === 'Quản lý Bot') ? 'active' : '' %>">
+                    <i class='bx bx-cog'></i> Quản lý Bot
+                </a></li>
+                <li><a href="/groups" class="nav-link <%= (typeof title !== 'undefined' && title === 'Quản lý Nhóm') ? 'active' : '' %>">
+                    <i class='bx bx-group'></i> Nhóm
+                </a></li>
+                <li><a href="/commands" class="nav-link <%= (typeof title !== 'undefined' && title === 'Quản lý Commands') ? 'active' : '' %>">
+                    <i class='bx bx-command'></i> Commands
+                </a></li>
+                <li><a href="/logs" class="nav-link <%= (typeof title !== 'undefined' && title === 'Xem Logs') ? 'active' : '' %>">
+                    <i class='bx bx-file-blank'></i> Logs
+                </a></li>
+                <li><a href="/settings" class="nav-link <%= (typeof title !== 'undefined' && title === 'Cài đặt') ? 'active' : '' %>">
+                    <i class='bx bx-slider-alt'></i> Settings
+                </a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <%- typeof body !== 'undefined' ? body : '' %>
+    </main>
+
+    <script src="/js/common.js"></script>
+</body>
+</html>

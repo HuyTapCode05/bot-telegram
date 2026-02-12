@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cài đặt - Telegram Bot Manager</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <%- include('partials/navbar', { active: 'settings' }) %>
+    <main class="main-content">
+        <div class="settings">
+            <div class="page-header">
+                <h1><i class='bx bx-slider-alt'></i> Cài đặt</h1>
+                <p>Cấu hình hệ thống</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class='bx bx-cog'></i> Cài đặt Bot</h2>
+                </div>
+                <div class="card-body">
+                    <div class="settings-form">
+                        <div class="form-group">
+                            <label>Port Website:</label>
+                            <input type="number" value="3000" disabled>
+                            <small>Mặc định: 3000 (có thể thay đổi qua biến môi trường WEB_PORT)</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Session Secret:</label>
+                            <input type="password" value="***" disabled>
+                            <small>Cấu hình qua biến môi trường SESSION_SECRET</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class='bx bx-info-circle'></i> Thông tin Hệ thống</h2>
+                </div>
+                <div class="card-body">
+                    <div class="info-item">
+                        <span class="info-label">Node.js Version:</span>
+                        <span class="info-value"><%= typeof nodeVersion !== 'undefined' ? nodeVersion : 'N/A' %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Platform:</span>
+                        <span class="info-value"><%= typeof platform !== 'undefined' ? platform : 'N/A' %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Uptime:</span>
+                        <span class="info-value" id="uptime">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="/js/common.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const startTime = Date.now();
+        setInterval(function() {
+            const uptime = Date.now() - startTime;
+            const seconds = Math.floor(uptime / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            let uptimeStr = '';
+            if (days > 0) uptimeStr += days + ' ngày ';
+            if (hours % 24 > 0) uptimeStr += (hours % 24) + ' giờ ';
+            if (minutes % 60 > 0) uptimeStr += (minutes % 60) + ' phút ';
+            uptimeStr += (seconds % 60) + ' giây';
+            document.getElementById('uptime').textContent = uptimeStr;
+        }, 1000);
+    });
+    </script>
+</body>
+</html>

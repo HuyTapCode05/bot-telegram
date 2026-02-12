@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xem Logs - Telegram Bot Manager</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <%- include('partials/navbar', { active: 'logs' }) %>
+    <main class="main-content">
+        <div class="logs">
+            <div class="page-header">
+                <h1><i class='bx bx-file-blank'></i> Xem Logs</h1>
+                <p>Theo dõi hoạt động của bot</p>
+            </div>
+
+            <div class="logs-tabs">
+                <button class="tab-btn active" onclick="showTab('messages')">Tin nhắn</button>
+                <button class="tab-btn" onclick="showTab('feedback')">Feedback</button>
+                <button class="tab-btn" onclick="showTab('reports')">Reports</button>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div id="messagesTab" class="tab-content active">
+                        <div class="log-controls">
+                            <input type="number" id="logLimit" value="100" min="10" max="1000" placeholder="Số lượng">
+                            <button onclick="loadMessages()">Tải lại</button>
+                        </div>
+                        <div id="messagesList" class="log-list">
+                            <p class="loading">Đang tải...</p>
+                        </div>
+                    </div>
+
+                    <div id="feedbackTab" class="tab-content">
+                        <div class="log-controls">
+                            <button onclick="loadFeedback()">Tải lại</button>
+                        </div>
+                        <pre id="feedbackContent" class="log-content"></pre>
+                    </div>
+
+                    <div id="reportsTab" class="tab-content">
+                        <div class="log-controls">
+                            <button onclick="loadReports()">Tải lại</button>
+                        </div>
+                        <pre id="reportsContent" class="log-content"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="/js/common.js"></script>
+    <script>
+    function showTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(function(tab) {
+            tab.classList.remove('active');
+        });
+        document.querySelectorAll('.tab-btn').forEach(function(btn) {
+            btn.classList.remove('active');
+        });
+        document.getElementById(tabName + 'Tab').classList.add('active');
+        event.target.classList.add('active');
+        if (tabName === 'messages') loadMessages();
+        else if (tabName === 'feedback') loadFeedback();
+        else if (tabName === 'reports') loadReports();
+    }
+    async function loadMessages() {
+        const limit = document.getElementById('logLimit').value || 100;
+        const messagesList = document.getElementById('messagesList');
+        messagesList.innerHTML = '<p class="loading">Đang tải...</p>';
+        try {
+            const res = await fetch('/api/logs/messages?limit=' + limit);
+            const data = await res.json();
+            if (data.success) {
+                if (data.data.length > 0) {
+                    messagesList.innerHTML = data.data.map(function(entry) {
+                        return '<div class="log-entry"><div class="log-header"><strong>Chat ID:</strong> ' + (entry.chatId || 'N/A') + ' | <strong>User ID:</strong> ' + (entry.userId || 'N/A') + ' | <strong>Time:</strong> ' + new Date(entry.timestamp).toLocaleString('vi-VN') + '</div><div class="log-body"><strong>User:</strong> ' + (entry.firstName || '') + ' ' + (entry.lastName || '') + ' (@' + (entry.username || 'N/A') + ')</div></div>';
+                    }).join('');
+                } else {
+                    messagesList.innerHTML = '<p>Chưa có tin nhắn nào</p>';
+                }
+            } else {
+                messagesList.innerHTML = '<p class="error">Lỗi: ' + data.error + '</p>';
+            }
+        } catch (error) {
+            messagesList.innerHTML = '<p class="error">Lỗi khi tải logs</p>';
+            console.error(error);
+        }
+    }
+    async function loadFeedback() {
+        const content = document.getElementById('feedbackContent');
+        content.textContent = 'Đang tải...';
+        try {
+            const res = await fetch('/api/logs/feedback');
+            const data = await res.json();
+            content.textContent = data.success ? (data.data || 'Chưa có feedback') : 'Lỗi: ' + data.error;
+        } catch (error) {
+            content.textContent = 'Lỗi khi tải feedback';
+            console.error(error);
+        }
+    }
+    async function loadReports() {
+        const content = document.getElementById('reportsContent');
+        content.textContent = 'Đang tải...';
+        try {
+            const res = await fetch('/api/logs/reports');
+            const data = await res.json();
+            content.textContent = data.success ? (data.data || 'Chưa có reports') : 'Lỗi: ' + data.error;
+        } catch (error) {
+            content.textContent = 'Lỗi khi tải reports';
+            console.error(error);
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        loadMessages();
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Commands - Telegram Bot Manager</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <%- include('partials/navbar', { active: 'commands' }) %>
+    <main class="main-content">
+        <div class="commands">
+            <div class="page-header">
+                <h1><i class='bx bx-command'></i> Quản lý Commands</h1>
+                <p>Danh sách các lệnh của bot</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class='bx bx-list-ul'></i> Danh sách Commands</h2>
+                </div>
+                <div class="card-body">
+                    <div class="commands-grid">
+                        <% if (typeof commands !== 'undefined' && commands && commands.length > 0) { %>
+                            <% commands.forEach(function(cmd) { %>
+                            <div class="command-card">
+                                <div class="command-header">
+                                    <h3>/<%= cmd.name %></h3>
+                                    <% if (cmd.aliases && cmd.aliases.length > 0) { %>
+                                    <div class="command-aliases">
+                                        <% cmd.aliases.forEach(function(alias) { %>
+                                        <span class="alias">/<%= alias %></span>
+                                        <% }); %>
+                                    </div>
+                                    <% } %>
+                                </div>
+                                <div class="command-body">
+                                    <p><%= cmd.description || 'Không có mô tả' %></p>
+                                </div>
+                            </div>
+                            <% }); %>
+                        <% } else { %>
+                        <p>Không có commands nào</p>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="/js/common.js"></script>
+</body>
+</html>

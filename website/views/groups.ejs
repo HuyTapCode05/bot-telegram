@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Nhóm - Telegram Bot Manager</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <%- include('partials/navbar', { active: 'groups' }) %>
+    <main class="main-content">
+        <div class="groups">
+            <div class="page-header">
+                <h1><i class='bx bx-group'></i> Quản lý Nhóm</h1>
+                <p>Quản lý trạng thái bot trong các nhóm</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class='bx bx-list-ul'></i> Danh sách Nhóm</h2>
+                </div>
+                <div class="card-body">
+                    <div id="groupsList">
+                        <p class="loading">Đang tải danh sách nhóm...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="/js/common.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+        const groupsList = document.getElementById('groupsList');
+        try {
+            const res = await fetch('/api/groups');
+            const data = await res.json();
+            if (data.success) {
+                if (data.data.length > 0) {
+                    groupsList.innerHTML = data.data.map(function(group) {
+                        return '<div class="group-item"><div class="group-info"><strong>Chat ID:</strong> ' + group.chatId + '</div><div class="group-controls"><label class="toggle-switch"><input type="checkbox" ' + (group.enabled ? 'checked' : '') + ' onchange="toggleGroup(\'' + group.chatId + '\', this.checked)"><span class="toggle-slider"></span></label><span>' + (group.enabled ? 'Bật' : 'Tắt') + '</span></div></div>';
+                    }).join('');
+                } else {
+                    groupsList.innerHTML = '<p>Chưa có nhóm nào</p>';
+                }
+            } else {
+                groupsList.innerHTML = '<p class="error">Lỗi: ' + data.error + '</p>';
+            }
+        } catch (error) {
+            groupsList.innerHTML = '<p class="error">Lỗi khi tải danh sách nhóm</p>';
+            console.error(error);
+        }
+    });
+    async function toggleGroup(chatId, enabled) {
+        try {
+            const res = await fetch('/api/groups/' + chatId + '/toggle', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ enabled: enabled })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert(data.message);
+            } else {
+                alert('Lỗi: ' + data.error);
+            }
+        } catch (error) {
+            alert('Lỗi khi cập nhật trạng thái');
+            console.error(error);
+        }
+    }
+    </script>
+</body>
+</html>
