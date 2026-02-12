@@ -1,20 +1,38 @@
-# 🤖 Telegram Bot Multi-Features
+# NPH Telegram Bot | 2025 - 2026
 
-<div align="center">
-  <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js"/>
-  <img src="https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram"/>
-  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript"/>
-  <img src="https://img.shields.io/github/license/HuyTapCode05/bot-telegram?style=for-the-badge" alt="License"/>
-</div>
+**Vị Trí:** Backend Developer
 
-<div align="center">
-  <h3>🚀 Bot Telegram đa chức năng với nhiều tính năng hữu ích</h3>
-  <p>Một bot Telegram mạnh mẽ với khả năng quản lý nhóm, phát nhạc, tiện ích và nhiều tính năng thú vị khác.</p>
-</div>
+**Link dự án:** https://github.com/HuyTapCode05/bot-telegram
+
+• **Multi-functional Telegram Bot** - JavaScript-based Telegram bot với đa dạng tính năng giải trí và tiện ích
+
+• **Music System** - Hệ thống phát nhạc real-time từ ZingMP3 và SoundCloud với queue management, controls (play, skip, pause, resume)
+
+• **AI Integration** - Tích hợp Canvas API cho tạo ảnh và đồ họa tự động
+
+• **Text-to-Speech** - Google TTS và Piper TTS với multi-language support (Vietnamese voices)
+
+• **Group Management** - Quản lý nhóm Telegram với user statistics, top chat analytics và admin controls
+
+• **Real-time Communication** - Telegraf v4 implementation với message handling và concurrent users support  
+
+• **Content Moderation** - Auto bad words filtering, welcome member system, slash commands với error handling
+
+• **Deploy** - Production environment, monitoring, 99.9% uptime
+
+**Công nghệ:** TypeScript, Node.js, Telegraf API, Canvas API, Puppeteer, Google Cloud TTS, SoundCloud API, ZingMP3 API, YouTube API
 
 ---
 
-## 📋 Tính năng chính
+## Tên dự án | Bắt đầu - Kết thúc
+
+**Vị trí của bạn trong dự án**
+
+Mô tả ngắn gọn về dự án, mục tiêu, vai trò của bạn, các công nghệ sử dụng và những thành tựu bạn đã đạt được trong dự án
+
+---
+
+## 📋 Tính năng chính (Chi tiết cho Developer)
 
 ### 🎵 **Âm nhạc**
 - **ZingMP3 Integration**: Tìm kiếm và phát nhạc từ ZingMP3

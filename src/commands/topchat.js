@@ -41,24 +41,24 @@ function logMessage(ctx) {
     if (!ctx.message) return;
     if (!ctx.chat) return;
     if (!ctx.from) return;
-    
+
     // Chỉ log tin nhắn trong group/supergroup, bỏ qua private chat
     if (ctx.chat.type === 'private') return;
-    
+
     // Bỏ qua tin nhắn từ bot (không tự đếm tin nhắn của chính mình)
     if (ctx.from.is_bot) return;
-    
+
     const store = readMessageLog();
     const messageId = ctx.message.message_id;
     const chatId = ctx.chat.id;
     const userId = ctx.from.id;
     const timestamp = ctx.message.date * 1000; // Convert to milliseconds
-    
+
     const key = `${chatId}_${messageId}`;
-    
+
     // Kiểm tra xem tin nhắn đã được log chưa để tránh duplicate
     if (store[key]) return;
-    
+
     store[key] = {
       messageId,
       chatId,
@@ -69,7 +69,7 @@ function logMessage(ctx) {
       timestamp,
       savedAt: Date.now()
     };
-    
+
     writeMessageLog(store);
   } catch (e) {
     console.error('Error logging message:', e.message);
@@ -91,11 +91,11 @@ function isSameDay(ts, now) {
   if (ms < 1e12) ms = ms * 1000;
   const d = new Date(ms);
   if (isNaN(d.getTime())) return false;
-  
+
   // So sánh theo múi giờ địa phương
-  return d.getDate() === now.getDate() && 
-         d.getMonth() === now.getMonth() && 
-         d.getFullYear() === now.getFullYear();
+  return d.getDate() === now.getDate() &&
+    d.getMonth() === now.getMonth() &&
+    d.getFullYear() === now.getFullYear();
 }
 
 /**
@@ -156,27 +156,27 @@ function getNextRankThreshold(currentCount) {
 async function drawTopChatCanvas(topList, nameMap, chatTitle = 'Infinite Coder') {
   const width = 768;
   const height = 120 + (topList.length * 90) + 80; // Header + entries + footer
-  
+
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
-  
+
   // Background gradient
   const gradient = ctx.createLinearGradient(0, 0, 0, height);
   gradient.addColorStop(0, '#1a1a2e');
   gradient.addColorStop(1, '#16213e');
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, width, height);
-  
+
   // Header
   ctx.fillStyle = '#FFD700';
   ctx.font = 'bold 36px Arial';
   ctx.textAlign = 'center';
   ctx.fillText('🏆 BẢNG XẾP HẠNG TƯƠNG TÁC 🏆', width / 2, 50);
-  
+
   ctx.fillStyle = '#FFA500';
   ctx.font = 'bold 24px Arial';
   ctx.fillText(`⚜️ ${chatTitle} ⚜️`, width / 2, 90);
-  
+
   // Separator line
   ctx.strokeStyle = '#FFD700';
   ctx.lineWidth = 2;
@@ -184,18 +184,18 @@ async function drawTopChatCanvas(topList, nameMap, chatTitle = 'Infinite Coder')
   ctx.moveTo(40, 110);
   ctx.lineTo(width - 40, 110);
   ctx.stroke();
-  
+
   // Draw each entry
   let y = 150;
   for (let i = 0; i < topList.length; i++) {
     const [uid, count] = topList[i];
     const name = nameMap.get(uid) || 'Unknown';
     const rank = getRankBadge(count);
-    
+
     // Entry background
     ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
     ctx.fillRect(30, y - 35, width - 60, 80);
-    
+
     // Rank number
     const medals = ['🥇', '🥈', '🥉'];
     const rankText = i < 3 ? medals[i] : `#${i + 1}`;
@@ -203,17 +203,17 @@ async function drawTopChatCanvas(topList, nameMap, chatTitle = 'Infinite Coder')
     ctx.font = 'bold 28px Arial';
     ctx.textAlign = 'left';
     ctx.fillText(rankText, 50, y);
-    
+
     // Name
     ctx.fillStyle = '#FFFFFF';
     ctx.font = 'bold 24px Arial';
     ctx.fillText(name, 120, y);
-    
+
     // Message count
     ctx.fillStyle = '#AAAAAA';
     ctx.font = '18px Arial';
     ctx.fillText(`💬 ${count} tin nhắn`, 120, y + 25);
-    
+
     // Load and draw rank image
     try {
       const rankImagePath = path.join(RANK_IMAGES_DIR, rank.image);
@@ -222,13 +222,13 @@ async function drawTopChatCanvas(topList, nameMap, chatTitle = 'Infinite Coder')
     } catch (e) {
       console.error('Error loading rank image:', e.message);
     }
-    
+
     // Rank name
     ctx.fillStyle = rank.color;
     ctx.font = 'bold 20px Arial';
     ctx.textAlign = 'right';
     ctx.fillText(rank.name, width - 50, y - 5);
-    
+
     // Draw stars using emoji (same as reference image)
     let starText = '';
     for (let s = 0; s < 5; s++) {
@@ -238,10 +238,10 @@ async function drawTopChatCanvas(topList, nameMap, chatTitle = 'Infinite Coder')
     ctx.font = '14px Arial';
     ctx.textAlign = 'right';
     ctx.fillText(starText, width - 50, y + 18);
-    
+
     y += 90;
   }
-  
+
   // Footer
   ctx.strokeStyle = '#FFD700';
   ctx.lineWidth = 2;
@@ -249,14 +249,14 @@ async function drawTopChatCanvas(topList, nameMap, chatTitle = 'Infinite Coder')
   ctx.moveTo(40, y);
   ctx.lineTo(width - 40, y);
   ctx.stroke();
-  
+
   const now = new Date();
   const dateStr = `${now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })} ${now.toLocaleDateString('vi-VN')}`;
   ctx.fillStyle = '#AAAAAA';
   ctx.font = '16px Arial';
   ctx.textAlign = 'center';
   ctx.fillText(`📅 Cập nhật: ${dateStr}`, width / 2, y + 35);
-  
+
   return canvas;
 }
 
@@ -266,38 +266,38 @@ async function drawTopChatCanvas(topList, nameMap, chatTitle = 'Infinite Coder')
 async function drawPersonalStatsCanvas(userName, count, rank, myRank, totalUsers, nextRank) {
   const width = 720;
   const height = 420;
-  
+
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
-  
+
   // Background with border
   const gradient = ctx.createLinearGradient(0, 0, 0, height);
   gradient.addColorStop(0, '#1a1a2e');
   gradient.addColorStop(1, '#16213e');
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, width, height);
-  
+
   // Golden border
   ctx.strokeStyle = '#FFD700';
   ctx.lineWidth = 4;
   ctx.strokeRect(10, 10, width - 20, height - 20);
-  
+
   // Title
   ctx.fillStyle = '#FFD700';
   ctx.font = 'bold 32px Arial';
   ctx.textAlign = 'center';
   ctx.fillText('🎯 Tương Tác Hôm Nay', width / 2, 70);
-  
+
   // Name
   ctx.fillStyle = '#FFFFFF';
   ctx.font = 'bold 36px Arial';
   ctx.fillText(userName, width / 2, 130);
-  
+
   // Message count
   ctx.fillStyle = '#AAAAAA';
   ctx.font = '24px Arial';
   ctx.fillText(`💬 ${count} tin nhắn trong hôm nay`, width / 2, 170);
-  
+
   // Load and draw rank image (centered)
   const rankBadge = getRankBadge(count);
   try {
@@ -307,12 +307,12 @@ async function drawPersonalStatsCanvas(userName, count, rank, myRank, totalUsers
   } catch (e) {
     console.error('Error loading rank image:', e.message);
   }
-  
+
   // Rank badge name
   ctx.fillStyle = rankBadge.color;
   ctx.font = 'bold 28px Arial';
   ctx.fillText(rankBadge.name, width / 2, 290);
-  
+
   // Draw stars using emoji
   let starText = '';
   for (let s = 0; s < 5; s++) {
@@ -321,19 +321,19 @@ async function drawPersonalStatsCanvas(userName, count, rank, myRank, totalUsers
   ctx.fillStyle = '#FFD700';
   ctx.font = '20px Arial';
   ctx.fillText(starText, width / 2, 318);
-  
+
   // Ranking
   ctx.fillStyle = '#FFFFFF';
   ctx.font = 'bold 24px Arial';
   ctx.fillText(`🏅 Xếp hạng: #${myRank}/${totalUsers}`, width / 2, 350);
-  
+
   // Next rank info
   if (nextRank) {
     ctx.fillStyle = '#FFD700';
     ctx.font = '20px Arial';
     ctx.fillText(`✨ Còn ${nextRank.remaining} tin nhắn nữa để lên bậc`, width / 2, 385);
   }
-  
+
   return canvas;
 }
 
@@ -345,34 +345,34 @@ async function topChatCommand(ctx) {
     const text = (ctx.message && ctx.message.text) || '';
     const parts = text.trim().split(/\s+/);
     const mode = parts[1] ? parts[1].toLowerCase() : 'today'; // Đổi mặc định từ 'week' sang 'today'
-    
+
     const chatId = ctx.chat.id;
     const chatType = ctx.chat.type;
-    
+
     // Chỉ hoạt động trong group
     if (chatType === 'private') {
       return ctx.reply('⚠️ Lệnh này chỉ hoạt động trong nhóm!');
     }
-    
+
     const now = new Date();
     const store = readMessageLog();
-    
+
     // Aggregate by user
     const counter = new Map();
     const nameMap = new Map();
     const myUserId = ctx.from.id;
-    
+
     for (const key of Object.keys(store)) {
       const entry = store[key];
       if (!entry) continue;
       if (!entry.userId) continue;
       if (!entry.chatId) continue;
       if (entry.chatId !== chatId) continue;
-      
+
       // Ưu tiên dùng savedAt vì nó chính xác hơn
       const checkTime = entry.savedAt || entry.timestamp;
       if (!checkTime) continue;
-      
+
       let dayMatch = false;
       if (mode === 'today') {
         // Chỉ đếm hôm nay
@@ -384,36 +384,36 @@ async function topChatCommand(ctx) {
         // Default: đếm TẤT CẢ tin nhắn từ trước đến giờ
         dayMatch = true;
       }
-      
+
       if (!dayMatch) continue;
-      
+
       const uid = entry.userId;
       counter.set(uid, (counter.get(uid) || 0) + 1);
       const displayName = [entry.firstName, entry.lastName].filter(Boolean).join(' ') || entry.username || `User ${uid}`;
       nameMap.set(uid, displayName);
     }
-    
+
     if (counter.size === 0) {
       const period = mode === 'today' ? 'hôm nay' : mode === 'week' ? '7 ngày qua' : 'từ trước đến giờ';
       return ctx.reply(`📊 Chưa có dữ liệu tương tác ${period} trong nhóm này.`);
     }
-    
+
     // Mode: me (chỉ hiển thị thông tin cá nhân)
     if (mode === 'me') {
       const myCount = counter.get(myUserId) || 0;
       if (myCount === 0) {
         return ctx.reply('❌ Bạn chưa có tin nhắn nào trong khoảng thời gian này!');
       }
-      
+
       const sorted = [...counter.entries()].sort((a, b) => b[1] - a[1]);
       const myRank = sorted.findIndex(([uid]) => uid === myUserId) + 1;
       const myName = nameMap.get(myUserId) || 'Unknown';
       const nextRank = getNextRankThreshold(myCount);
-      
+
       // Generate canvas image
       try {
         const canvas = await drawPersonalStatsCanvas(myName, myCount, getRankBadge(myCount), myRank, counter.size, nextRank);
-        
+
         // Save to temp file
         if (!fs.existsSync(TEMP_DIR)) {
           fs.mkdirSync(TEMP_DIR, { recursive: true });
@@ -421,32 +421,32 @@ async function topChatCommand(ctx) {
         const tempFile = path.join(TEMP_DIR, `topchat_me_${Date.now()}.png`);
         const buffer = canvas.toBuffer('image/png');
         fs.writeFileSync(tempFile, buffer);
-        
+
         // Send image
         await ctx.replyWithPhoto({ source: fs.createReadStream(tempFile) });
-        
+
         // Delete temp file
         try {
           fs.unlinkSync(tempFile);
-        } catch (e) {}
-        
+        } catch (e) { }
+
         return;
       } catch (err) {
         console.error('Canvas error:', err);
         return ctx.reply('❌ Không thể tạo ảnh thống kê. Vui lòng thử lại sau.');
       }
     }
-    
+
     // Mode: today hoặc week (hiển thị top 10)
     const topList = [...counter.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
-    
+
     // Get chat title
     const chatTitle = ctx.chat.title || 'Infinite Coder';
-    
+
     // Generate canvas image
     try {
       const canvas = await drawTopChatCanvas(topList, nameMap, chatTitle);
-      
+
       // Save to temp file
       if (!fs.existsSync(TEMP_DIR)) {
         fs.mkdirSync(TEMP_DIR, { recursive: true });
@@ -454,21 +454,21 @@ async function topChatCommand(ctx) {
       const tempFile = path.join(TEMP_DIR, `topchat_${Date.now()}.png`);
       const buffer = canvas.toBuffer('image/png');
       fs.writeFileSync(tempFile, buffer);
-      
+
       // Send image
       await ctx.replyWithPhoto({ source: fs.createReadStream(tempFile) });
-      
+
       // Delete temp file
       try {
         fs.unlinkSync(tempFile);
-      } catch (e) {}
-      
+      } catch (e) { }
+
       return;
     } catch (err) {
       console.error('Canvas error:', err);
       return ctx.reply('❌ Không thể tạo ảnh thống kê. Vui lòng thử lại sau.');
     }
-    
+
   } catch (error) {
     console.error('topChatCommand error:', error.message);
     return ctx.reply('❌ Đã xảy ra lỗi khi thống kê. Vui lòng thử lại sau.');
@@ -476,8 +476,12 @@ async function topChatCommand(ctx) {
 }
 
 module.exports = {
-  topChatCommand,
+  name: 'topchat',
+  description: 'Thống kê chat nhóm',
+  handler: topChatCommand,
+  // Exports thêm cho middleware logger
   logMessage,
   readMessageLog,
   writeMessageLog
 };
+

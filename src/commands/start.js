@@ -1,5 +1,8 @@
-module.exports = (ctx) => {
-  const text = `💫 <b>**DANH SÁCH LỆNH VÀ DỊCH VỤ:**</b>
+module.exports = {
+  name: 'start',
+  description: 'Bắt đầu / hướng dẫn',
+  handler: (ctx) => {
+    const text = `💫 <b>**DANH SÁCH LỆNH VÀ DỊCH VỤ:**</b>
 
 📌 <b>Lệnh cơ bản:</b>
 • /start - Khởi động bot
@@ -27,9 +30,10 @@ module.exports = (ctx) => {
 
 ℹ️ Gõ /help để xem hướng dẫn chi tiết.`;
 
-  try {
-    return ctx.reply(text, { parse_mode: 'HTML' });
-  } catch (e) {
-    return ctx.reply('Xin chào — sử dụng /help để xem danh sách lệnh.');
+    try {
+      return ctx.reply(text, { parse_mode: 'HTML' });
+    } catch (e) {
+      return ctx.reply('Xin chào — sử dụng /help để xem danh sách lệnh.');
+    }
   }
 };

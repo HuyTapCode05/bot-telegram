@@ -3,7 +3,7 @@ const path = require('path');
 const canvasUtil = require('../utils/canvas');
 
 // Handler for /userinfo
-module.exports = async function userInfoCommand(ctx) {
+async function userInfoCommand(ctx) {
   try {
     const message = ctx.message;
     let targetUser = null;
@@ -19,9 +19,9 @@ module.exports = async function userInfoCommand(ctx) {
       const arg = parts.slice(1).join(' ').trim();
       // try parse id
       if (/^\d+$/.test(arg)) {
-        try { targetUser = await ctx.telegram.getChat(arg); } catch (e) {}
+        try { targetUser = await ctx.telegram.getChat(arg); } catch (e) { }
       } else if (arg.startsWith('@')) {
-        try { targetUser = await ctx.telegram.getChat(arg); } catch (e) {}
+        try { targetUser = await ctx.telegram.getChat(arg); } catch (e) { }
       }
     }
 
@@ -82,14 +82,21 @@ module.exports = async function userInfoCommand(ctx) {
           if (txt) viewers.push(txt);
         }
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // create image
     const imgPath = await canvasUtil.createUserInfoImage(userInfo, viewers);
     await ctx.replyWithPhoto({ source: imgPath }, { caption: `Thông tin: ${userInfo.name}` });
-    try { canvasUtil.clearImagePath(imgPath); } catch (e) {}
+    try { canvasUtil.clearImagePath(imgPath); } catch (e) { }
   } catch (e) {
     console.error('userinfo command error', e && e.message);
     ctx.reply('Không thể lấy thông tin người dùng.');
   }
 };
+
+module.exports = {
+  name: 'userinfo',
+  description: 'Thông tin người dùng',
+  handler: userInfoCommand
+};
+

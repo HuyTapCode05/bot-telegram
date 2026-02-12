@@ -59,18 +59,18 @@ function dataURLToBuffer(dataURL) {
 async function donateCommand(ctx) {
   try {
     const loadingMsg = await ctx.reply('💳 Đang tạo mã QR thanh toán...');
-    
+
     // Tạo QR code
     const qrDataURL = await generateVietQR(BANK_INFO);
-    
+
     if (!qrDataURL) {
-      await ctx.telegram.deleteMessage(ctx.chat.id, loadingMsg.message_id).catch(() => {});
+      await ctx.telegram.deleteMessage(ctx.chat.id, loadingMsg.message_id).catch(() => { });
       return ctx.reply('❌ Không thể tạo mã QR. Vui lòng thử lại sau.');
     }
 
     // Chuyển base64 thành buffer để gửi ảnh
     const imageBuffer = dataURLToBuffer(qrDataURL);
-    
+
     // Tạo caption với thông tin
     const caption = `
 💝 **Ủng hộ phát triển Bot**
@@ -88,14 +88,14 @@ _Cảm ơn bạn đã ủng hộ!_ ❤️
     // Gửi ảnh QR
     await ctx.replyWithPhoto(
       { source: imageBuffer },
-      { 
+      {
         caption,
         parse_mode: 'Markdown'
       }
     );
 
     // Xóa tin nhắn loading
-    await ctx.telegram.deleteMessage(ctx.chat.id, loadingMsg.message_id).catch(() => {});
+    await ctx.telegram.deleteMessage(ctx.chat.id, loadingMsg.message_id).catch(() => { });
 
   } catch (error) {
     console.error('donateCommand error:', error.message);
@@ -103,4 +103,8 @@ _Cảm ơn bạn đã ủng hộ!_ ❤️
   }
 }
 
-module.exports = donateCommand;
+module.exports = {
+  name: 'donate',
+  description: 'Ủng hộ phát triển bot',
+  handler: donateCommand
+};

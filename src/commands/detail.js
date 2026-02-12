@@ -25,7 +25,7 @@ function getPackageVersion() {
   }
 }
 
-module.exports = async function detailCommand(ctx) {
+async function detailCommand(ctx) {
   try {
     const uptimeSec = process.uptime();
     const uptime = formatTime(uptimeSec);
@@ -61,7 +61,7 @@ module.exports = async function detailCommand(ctx) {
         };
         const imagePath = await canvasUtil.createBotInfoImage({ displayName: ctx.botInfoName || 'Bot' }, uptime, 'N/A', botStats, [], []);
         await ctx.replyWithPhoto({ source: fs.createReadStream(imagePath) });
-        try { canvasUtil.clearImagePath(imagePath); } catch (e) {}
+        try { canvasUtil.clearImagePath(imagePath); } catch (e) { }
         return;
       } catch (e) {
         console.error('createBotInfoImage error', e && e.message);
@@ -71,6 +71,12 @@ module.exports = async function detailCommand(ctx) {
     await ctx.reply(text);
   } catch (e) {
     console.error('detail command error', e && e.message);
-    try { await ctx.reply('Đã xảy ra lỗi khi lấy thông tin.'); } catch (e) {}
+    try { await ctx.reply('Đã xảy ra lỗi khi lấy thông tin.'); } catch (e) { }
   }
+}
+
+module.exports = {
+  name: 'detail',
+  description: 'Thông tin hệ thống của bot',
+  handler: detailCommand
 };

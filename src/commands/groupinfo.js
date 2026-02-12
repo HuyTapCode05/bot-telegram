@@ -1,5 +1,6 @@
 const { getGroupInfo } = require('./groupinfo_core');
-module.exports = async function groupInfoCommand(ctx) {
+
+async function groupInfoCommand(ctx) {
   try {
     const info = await getGroupInfo(ctx);
     const title = info.title || 'Không có tên';
@@ -28,7 +29,7 @@ module.exports = async function groupInfoCommand(ctx) {
         }
       };
       await ctx.replyWithPhoto({ source: imgPath }, { caption: `Thông tin nhóm: ${escapeHtml(title)}`, ...kb });
-      try { canvasUtil.clearImagePath(imgPath); } catch (e) {}
+      try { canvasUtil.clearImagePath(imgPath); } catch (e) { }
       return;
     } catch (e) {
       // fallback: if canvas not installed, send text and hint how to install
@@ -57,6 +58,13 @@ module.exports = async function groupInfoCommand(ctx) {
     console.error('groupinfo error', e && e.message);
     return ctx.reply('Đã có lỗi khi lấy thông tin nhóm.');
   }
+}
+
+function escapeHtml(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+module.exports = {
+  name: 'groupinfo',
+  description: 'Thông tin nhóm (gửi ảnh)',
+  handler: groupInfoCommand
 };
 
-function escapeHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }

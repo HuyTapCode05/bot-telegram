@@ -1,5 +1,8 @@
-module.exports = async function helpCommand(ctx) {
-  const helpText = `Các lệnh hiện có:
+module.exports = {
+    name: 'help',
+    description: 'Hiển thị hướng dẫn',
+    handler: async (ctx) => {
+        const helpText = `Các lệnh hiện có:
 /start - Khởi động bot
 /lovelink <text> - Tạo love-link
 /phatnguoi <BIENSO> [xemay|oto] - Tra cứu phạt nguội. Ví dụ: /phatnguoi 62N123456 xemay
@@ -17,5 +20,6 @@ module.exports = async function helpCommand(ctx) {
 /help - Hiển thị hướng dẫn này
 
 Nếu cần hỗ trợ, vui lòng liên hệ @huydev.`;
-  ctx.reply(helpText);
+        ctx.reply(helpText);
+    }
 };
