@@ -7,6 +7,7 @@ const fs = require('fs');
 let bot = null;
 let botState = null;
 let readMessageLog = null;
+let botManager = null;
 
 try {
   bot = require('../src/bot');
@@ -14,6 +15,12 @@ try {
   readMessageLog = require('../src/commands/topchat').readMessageLog;
 } catch (error) {
   console.warn('⚠️  Warning: Could not load bot modules:', error.message);
+}
+
+try {
+  botManager = require('../src/botManager');
+} catch (error) {
+  console.warn('⚠️  Warning: Could not load botManager:', error.message);
 }
 
 const app = express();
@@ -169,6 +176,12 @@ app.get('/settings', requireAuth, async (req, res) => {
   });
 });
 
+app.get('/create-bot', requireAuth, async (req, res) => {
+  res.render('create-bot', {
+    title: 'Tạo Bot'
+  });
+});
+
 // API Routes
 app.get('/api/bot/info', requireAuth, async (req, res) => {
   try {
@@ -309,6 +322,76 @@ app.get('/api/logs/reports', requireAuth, async (req, res) => {
     } else {
       res.json({ success: true, data: '' });
     }
+  } catch (error) {
+    res.json({ success: false, error: error.message });
+  }
+});
+
+// ── Bot Management API ──
+app.get('/api/bots', requireAuth, async (req, res) => {
+  try {
+    if (!botManager) {
+      return res.json({ success: false, error: 'Bot manager không khả dụng' });
+    }
+    const bots = botManager.getAllBots();
+    res.json({ success: true, data: bots });
+  } catch (error) {
+    res.json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/bots/create', requireAuth, async (req, res) => {
+  try {
+    if (!botManager) {
+      return res.json({ success: false, error: 'Bot manager không khả dụng' });
+    }
+    const { token, name } = req.body;
+    
+    if (!token) {
+      return res.json({ success: false, error: 'BOT_TOKEN là bắt buộc' });
+    }
+    
+    const botData = await botManager.addBot(token, name);
+    res.json({ success: true, data: botData, message: 'Bot đã được tạo thành công' });
+  } catch (error) {
+    res.json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/bots/:botId/start', requireAuth, async (req, res) => {
+  try {
+    if (!botManager) {
+      return res.json({ success: false, error: 'Bot manager không khả dụng' });
+    }
+    const { botId } = req.params;
+    const result = await botManager.startBot(botId);
+    res.json(result);
+  } catch (error) {
+    res.json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/bots/:botId/stop', requireAuth, async (req, res) => {
+  try {
+    if (!botManager) {
+      return res.json({ success: false, error: 'Bot manager không khả dụng' });
+    }
+    const { botId } = req.params;
+    const result = await botManager.stopBot(botId);
+    res.json(result);
+  } catch (error) {
+    res.json({ success: false, error: error.message });
+  }
+});
+
+app.delete('/api/bots/:botId/delete', requireAuth, async (req, res) => {
+  try {
+    if (!botManager) {
+      return res.json({ success: false, error: 'Bot manager không khả dụng' });
+    }
+    const { botId } = req.params;
+    const result = await botManager.deleteBot(botId);
+    res.json(result);
   } catch (error) {
     res.json({ success: false, error: error.message });
   }

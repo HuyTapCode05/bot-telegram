@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tạo Bot - Telegram Bot Manager</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .container { max-width: 960px; margin: 100px auto; padding: 16px; }
+        .card { background:#fff; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,.08); padding:20px; margin-bottom: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+        .form-input { padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; transition: border-color 0.2s ease; }
+        .form-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .form-label { font-weight: 600; color: #374151; margin-bottom: 4px; }
+        .form-help { color: #6b7280; font-size: 12px; margin-top: -8px; line-height: 1.4; }
+        .btn { padding:10px 14px; border-radius:8px; border:0; cursor:pointer; background:#111827; color:#fff; transition: background 0.2s ease; display: flex; align-items: center; gap: 8px; }
+        .btn:hover { background:#374151; }
+        .btn:disabled { background:#9ca3af; cursor: not-allowed; }
+        .btn.secondary { background:#2563eb; }
+        .btn.secondary:hover { background:#1d4ed8; }
+        .btn.success { background:#059669; }
+        .btn.success:hover { background:#047857; }
+        .alert { padding: 12px; border-radius: 8px; margin-bottom: 16px; }
+        .alert.success { background: #d1fae5; color: #065f46; border: 1px solid #10b981; }
+        .alert.error { background: #fee2e2; color: #991b1b; border: 1px solid #ef4444; }
+        .alert.info { background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; }
+        .title { font-weight:700; font-size:18px; margin-bottom:12px; }
+    </style>
+</head>
+<body>
+    <%- include('partials/navbar', { active: 'create-bot' }) %>
+    <main class="main-content">
+        <div class="container">
+            <div class="card">
+                <div class="title">
+                    <i class='bx bx-plus-circle'></i> Tạo Bot Mới
+                </div>
+                <div class="alert info">
+                    <strong>Hướng dẫn:</strong> Để tạo bot mới, bạn cần lấy BOT_TOKEN từ <a href="https://t.me/BotFather" target="_blank" style="color: #1e40af; text-decoration: underline;">@BotFather</a> trên Telegram.
+                </div>
+                
+                <div id="alertContainer"></div>
+                
+                <form id="createBotForm" class="form-group">
+                    <div>
+                        <label class="form-label">Tên Bot (tùy chọn)</label>
+                        <input type="text" id="botName" placeholder="Để trống sẽ dùng tên mặc định từ BotFather" class="form-input" autocomplete="off">
+                        <div class="form-help">Tên hiển thị cho bot này trong hệ thống quản lý</div>
+                    </div>
+                    
+                    <div>
+                        <label class="form-label">BOT_TOKEN <span style="color: #ef4444;">*</span></label>
+                        <input type="text" id="botToken" placeholder="1234567890:ABCdefGHIjklMNOpqrsTUVwxyz" class="form-input" required autocomplete="off">
+                        <div class="form-help">
+                            Lấy token từ @BotFather: /newbot → chọn tên → lấy token
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn secondary" id="submitBtn">
+                        <i class='bx bx-plus'></i> Tạo Bot
+                    </button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <div class="title">
+                    <i class='bx bx-list-ul'></i> Danh sách Bots
+                </div>
+                <div id="botsList">
+                    <p class="loading">Đang tải...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="/js/common.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        loadBotsList();
+    });
+    
+    function showAlert(message, type) {
+        const container = document.getElementById('alertContainer');
+        const alert = document.createElement('div');
+        alert.className = 'alert ' + type;
+        alert.innerHTML = message;
+        container.appendChild(alert);
+        setTimeout(() => alert.remove(), 5000);
+    }
+    
+    async function loadBotsList() {
+        const list = document.getElementById('botsList');
+        try {
+            const res = await fetch('/api/bots');
+            const data = await res.json();
+            
+            if (data.success) {
+                if (data.data.length > 0) {
+                    list.innerHTML = data.data.map(function(bot) {
+                        return '<div class="bot-item" style="padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">' +
+                            '<div>' +
+                            '<strong>' + (bot.name || 'Bot ' + bot.id) + '</strong> ' +
+                            (bot.username ? '<span style="color: #6b7280;">@' + bot.username + '</span>' : '') +
+                            '<div style="font-size: 12px; color: #6b7280; margin-top: 4px;">ID: ' + bot.id + ' | Status: <span style="color: ' + (bot.status === 'running' ? '#059669' : '#ef4444') + ';">' + bot.status + '</span></div>' +
+                            '</div>' +
+                            '<div style="display: flex; gap: 8px;">' +
+                            (bot.status === 'running' ? 
+                                '<button class="btn" onclick="stopBot(\'' + bot.id + '\')" style="background: #ef4444; padding: 6px 12px; font-size: 12px;"><i class="bx bx-stop"></i> Dừng</button>' :
+                                '<button class="btn success" onclick="startBot(\'' + bot.id + '\')" style="padding: 6px 12px; font-size: 12px;"><i class="bx bx-play"></i> Chạy</button>') +
+                            '<button class="btn" onclick="deleteBot(\'' + bot.id + '\')" style="background: #6b7280; padding: 6px 12px; font-size: 12px;"><i class="bx bx-trash"></i> Xóa</button>' +
+                            '</div>' +
+                            '</div>';
+                    }).join('');
+                } else {
+                    list.innerHTML = '<p style="color: #6b7280;">Chưa có bot nào. Tạo bot đầu tiên ở trên!</p>';
+                }
+            } else {
+                list.innerHTML = '<p class="error">Lỗi: ' + data.error + '</p>';
+            }
+        } catch (error) {
+            list.innerHTML = '<p class="error">Lỗi khi tải danh sách bots</p>';
+            console.error(error);
+        }
+    }
+    
+    document.getElementById('createBotForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const token = document.getElementById('botToken').value.trim();
+        const name = document.getElementById('botName').value.trim() || null;
+        
+        if (!token) {
+            showAlert('Vui lòng nhập BOT_TOKEN', 'error');
+            return;
+        }
+        
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="bx bx-loader-alt" style="animation: spin 1s linear infinite;"></i> Đang tạo...';
+        
+        try {
+            const res = await fetch('/api/bots/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token, name })
+            });
+            
+            const data = await res.json();
+            
+            if (data.success) {
+                showAlert('✅ Tạo bot thành công!', 'success');
+                document.getElementById('createBotForm').reset();
+                loadBotsList();
+            } else {
+                showAlert('❌ Lỗi: ' + data.error, 'error');
+            }
+        } catch (error) {
+            showAlert('❌ Lỗi khi tạo bot: ' + error.message, 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bx bx-plus"></i> Tạo Bot';
+        }
+    });
+    
+    async function startBot(botId) {
+        try {
+            const res = await fetch('/api/bots/' + botId + '/start', { method: 'POST' });
+            const data = await res.json();
+            if (data.success) {
+                showAlert('✅ Bot đã khởi động', 'success');
+                loadBotsList();
+            } else {
+                showAlert('❌ Lỗi: ' + data.error, 'error');
+            }
+        } catch (error) {
+            showAlert('❌ Lỗi: ' + error.message, 'error');
+        }
+    }
+    
+    async function stopBot(botId) {
+        try {
+            const res = await fetch('/api/bots/' + botId + '/stop', { method: 'POST' });
+            const data = await res.json();
+            if (data.success) {
+                showAlert('✅ Bot đã dừng', 'success');
+                loadBotsList();
+            } else {
+                showAlert('❌ Lỗi: ' + data.error, 'error');
+            }
+        } catch (error) {
+            showAlert('❌ Lỗi: ' + error.message, 'error');
+        }
+    }
+    
+    async function deleteBot(botId) {
+        if (!confirm('Bạn có chắc muốn xóa bot này?')) return;
+        
+        try {
+            const res = await fetch('/api/bots/' + botId + '/delete', { method: 'DELETE' });
+            const data = await res.json();
+            if (data.success) {
+                showAlert('✅ Bot đã bị xóa', 'success');
+                loadBotsList();
+            } else {
+                showAlert('❌ Lỗi: ' + data.error, 'error');
+            }
+        } catch (error) {
+            showAlert('❌ Lỗi: ' + error.message, 'error');
+        }
+    }
+    </script>
+</body>
+</html>
+

@@ -45,6 +45,7 @@ Thumbs.db
 # Bot specific
 src/config/bot_state.json
 config.json
+config/bots.json
 
 # Optional npm cache directory
 .npm

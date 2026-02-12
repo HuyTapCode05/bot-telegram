@@ -75,15 +75,24 @@ async function setupBotToken() {
 // Main function
 async function main() {
     try {
-        // Setup BOT_TOKEN
+        // Setup BOT_TOKEN (cho bot chính)
         await setupBotToken();
 
-        // Load bot
+        // Load bot chính (từ .env)
         const bot = require("./src/bot");
 
-        // Launch bot
+        // Launch bot chính
         bot.launch();
-        console.log("🚀 Bot Telegram đã chạy!");
+        console.log("🚀 Bot Telegram chính đã chạy!");
+
+        // Khôi phục các bot con (nếu có)
+        try {
+            const botManager = require("./src/botManager");
+            await botManager.restoreBots();
+            console.log("📦 Đã khôi phục các bot con\n");
+        } catch (error) {
+            console.warn("⚠️  Không thể khôi phục bot con:", error.message);
+        }
 
         // Always start website (auto-start)
         const webApp = require('./website/app');

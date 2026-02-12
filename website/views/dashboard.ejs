@@ -93,18 +93,29 @@
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="card-header">
-                        <h2><i class='bx bx-bar-chart-alt-2'></i> Thống kê nhóm</h2>
-                    </div>
-                    <div class="card-body">
-                        <div id="chatStatsList">
-                            <p class="loading">Đang tải...</p>
-                        </div>
-                    </div>
+        <div class="card">
+            <div class="card-header">
+                <h2><i class='bx bx-bar-chart-alt-2'></i> Thống kê nhóm</h2>
+            </div>
+            <div class="card-body">
+                <div id="chatStatsList">
+                    <p class="loading">Đang tải...</p>
                 </div>
             </div>
         </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2><i class='bx bx-bot'></i> Danh sách Bots</h2>
+            </div>
+            <div class="card-body">
+                <div id="botsList">
+                    <p class="loading">Đang tải...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
     </main>
 
     <script src="/js/common.js"></script>
@@ -143,7 +154,43 @@
         } catch (error) {
             document.getElementById('botStatus').textContent = 'Lỗi';
         }
+        
+        // Load bots list
+        loadBotsList();
     });
+    
+    async function loadBotsList() {
+        const botsList = document.getElementById('botsList');
+        try {
+            const res = await fetch('/api/bots');
+            const data = await res.json();
+            
+            if (data.success) {
+                if (data.data.length > 0) {
+                    botsList.innerHTML = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px;">' +
+                        data.data.map(function(bot) {
+                            return '<div style="padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; background: #f9fafb;">' +
+                                '<div style="font-weight: 600; margin-bottom: 4px;">' + (bot.name || 'Bot ' + bot.id) + '</div>' +
+                                (bot.username ? '<div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">@' + bot.username + '</div>' : '') +
+                                '<div style="font-size: 11px; color: #6b7280; margin-bottom: 8px;">ID: ' + bot.id + '</div>' +
+                                '<div style="display: flex; align-items: center; gap: 8px;">' +
+                                '<span style="font-size: 12px; padding: 4px 8px; border-radius: 4px; background: ' + (bot.status === 'running' ? '#d1fae5' : '#fee2e2') + '; color: ' + (bot.status === 'running' ? '#065f46' : '#991b1b') + ';">' + bot.status + '</span>' +
+                                '</div>' +
+                                '</div>';
+                        }).join('') +
+                        '</div>' +
+                        '<div style="margin-top: 12px;"><a href="/create-bot" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; background: #2563eb; color: #fff; border-radius: 8px;"><i class="bx bx-plus"></i> Tạo Bot Mới</a></div>';
+                } else {
+                    botsList.innerHTML = '<p style="color: #6b7280;">Chưa có bot con nào. <a href="/create-bot" style="color: #2563eb; text-decoration: underline;">Tạo bot đầu tiên</a>!</p>';
+                }
+            } else {
+                botsList.innerHTML = '<p class="error">Lỗi: ' + data.error + '</p>';
+            }
+        } catch (error) {
+            botsList.innerHTML = '<p class="error">Lỗi khi tải danh sách bots</p>';
+            console.error(error);
+        }
+    }
     </script>
 </body>
 </html>
