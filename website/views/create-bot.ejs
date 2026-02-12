@@ -8,68 +8,495 @@
     <link href="https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        .container { max-width: 960px; margin: 100px auto; padding: 16px; }
-        .card { background:#fff; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,.08); padding:20px; margin-bottom: 20px; }
-        .form-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
-        .form-input { padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; transition: border-color 0.2s ease; }
-        .form-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-        .form-label { font-weight: 600; color: #374151; margin-bottom: 4px; }
-        .form-help { color: #6b7280; font-size: 12px; margin-top: -8px; line-height: 1.4; }
-        .btn { padding:10px 14px; border-radius:8px; border:0; cursor:pointer; background:#111827; color:#fff; transition: background 0.2s ease; display: flex; align-items: center; gap: 8px; }
-        .btn:hover { background:#374151; }
-        .btn:disabled { background:#9ca3af; cursor: not-allowed; }
-        .btn.secondary { background:#2563eb; }
-        .btn.secondary:hover { background:#1d4ed8; }
-        .btn.success { background:#059669; }
-        .btn.success:hover { background:#047857; }
-        .alert { padding: 12px; border-radius: 8px; margin-bottom: 16px; }
-        .alert.success { background: #d1fae5; color: #065f46; border: 1px solid #10b981; }
-        .alert.error { background: #fee2e2; color: #991b1b; border: 1px solid #ef4444; }
-        .alert.info { background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; }
-        .title { font-weight:700; font-size:18px; margin-bottom:12px; }
+        .create-bot-page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .page-header h1 i {
+            color: #3b82f6;
+            font-size: 2.25rem;
+        }
+
+        .page-header p {
+            color: #6b7280;
+            font-size: 1rem;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid #e5e7eb;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        .card-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-header i {
+            font-size: 1.75rem;
+            color: #3b82f6;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .info-box i {
+            font-size: 1.5rem;
+            margin-top: 0.25rem;
+        }
+
+        .info-box-content {
+            flex: 1;
+        }
+
+        .info-box-content strong {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .info-box-content a {
+            color: white;
+            text-decoration: underline;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-label .required {
+            color: #ef4444;
+            margin-left: 0.25rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: #ffffff;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .form-help {
+            color: #6b7280;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            line-height: 1.5;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-help i {
+            font-size: 1rem;
+            color: #9ca3af;
+        }
+
+        .btn {
+            padding: 0.875rem 1.5rem;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .alert.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .alert.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+
+        .bots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .bot-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bot-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .bot-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-color: #3b82f6;
+        }
+
+        .bot-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .bot-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .bot-name i {
+            color: #3b82f6;
+            font-size: 1.25rem;
+        }
+
+        .bot-status {
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .bot-status.running {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .bot-status.stopped {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .bot-info {
+            margin-bottom: 1rem;
+        }
+
+        .bot-info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+        }
+
+        .bot-info-item i {
+            font-size: 1rem;
+            color: #9ca3af;
+        }
+
+        .bot-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            border-radius: 8px;
+            flex: 1;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-stop {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-stop:hover {
+            background: #d97706;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #6b7280;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #d1d5db;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .empty-state h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+
+        .empty-state p {
+            margin-bottom: 1.5rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .spinner {
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
     </style>
 </head>
 <body>
     <%- include('partials/navbar', { active: 'create-bot' }) %>
     <main class="main-content">
-        <div class="container">
+        <div class="create-bot-page">
+            <div class="page-header">
+                <h1>
+                    <i class='bx bx-plus-circle'></i>
+                    Tạo Bot Mới
+                </h1>
+                <p>Thêm bot Telegram mới vào hệ thống quản lý</p>
+            </div>
+
             <div class="card">
-                <div class="title">
-                    <i class='bx bx-plus-circle'></i> Tạo Bot Mới
+                <div class="card-header">
+                    <h2>
+                        <i class='bx bx-edit-alt'></i>
+                        Thông tin Bot
+                    </h2>
                 </div>
-                <div class="alert info">
-                    <strong>Hướng dẫn:</strong> Để tạo bot mới, bạn cần lấy BOT_TOKEN từ <a href="https://t.me/BotFather" target="_blank" style="color: #1e40af; text-decoration: underline;">@BotFather</a> trên Telegram.
+
+                <div class="info-box">
+                    <i class='bx bx-info-circle'></i>
+                    <div class="info-box-content">
+                        <strong>Hướng dẫn:</strong>
+                        Để tạo bot mới, bạn cần lấy BOT_TOKEN từ 
+                        <a href="https://t.me/BotFather" target="_blank">@BotFather</a> 
+                        trên Telegram. Nhắn tin cho @BotFather và sử dụng lệnh /newbot để tạo bot mới.
+                    </div>
                 </div>
                 
                 <div id="alertContainer"></div>
                 
-                <form id="createBotForm" class="form-group">
-                    <div>
-                        <label class="form-label">Tên Bot (tùy chọn)</label>
-                        <input type="text" id="botName" placeholder="Để trống sẽ dùng tên mặc định từ BotFather" class="form-input" autocomplete="off">
-                        <div class="form-help">Tên hiển thị cho bot này trong hệ thống quản lý</div>
-                    </div>
-                    
-                    <div>
-                        <label class="form-label">BOT_TOKEN <span style="color: #ef4444;">*</span></label>
-                        <input type="text" id="botToken" placeholder="1234567890:ABCdefGHIjklMNOpqrsTUVwxyz" class="form-input" required autocomplete="off">
+                <form id="createBotForm">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class='bx bx-rename'></i>
+                            Tên Bot (tùy chọn)
+                        </label>
+                        <input 
+                            type="text" 
+                            id="botName" 
+                            placeholder="Ví dụ: Bot hỗ trợ khách hàng" 
+                            class="form-input" 
+                            autocomplete="off"
+                        >
                         <div class="form-help">
-                            Lấy token từ @BotFather: /newbot → chọn tên → lấy token
+                            <i class='bx bx-info-circle'></i>
+                            Để trống sẽ sử dụng tên mặc định từ BotFather. Tên này chỉ dùng để hiển thị trong hệ thống quản lý.
                         </div>
                     </div>
                     
-                    <button type="submit" class="btn secondary" id="submitBtn">
-                        <i class='bx bx-plus'></i> Tạo Bot
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class='bx bx-key'></i>
+                            BOT_TOKEN
+                            <span class="required">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="botToken" 
+                            placeholder="1234567890:ABCdefGHIjklMNOpqrsTUVwxyz" 
+                            class="form-input" 
+                            required 
+                            autocomplete="off"
+                        >
+                        <div class="form-help">
+                            <i class='bx bx-help-circle'></i>
+                            Lấy token từ @BotFather: Gửi lệnh /newbot → chọn tên bot → lấy token được cung cấp
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <i class='bx bx-plus'></i>
+                        Tạo Bot
                     </button>
                 </form>
             </div>
             
             <div class="card">
-                <div class="title">
-                    <i class='bx bx-list-ul'></i> Danh sách Bots
+                <div class="card-header">
+                    <h2>
+                        <i class='bx bx-list-ul'></i>
+                        Danh sách Bots
+                    </h2>
                 </div>
                 <div id="botsList">
-                    <p class="loading">Đang tải...</p>
+                    <div class="loading">Đang tải danh sách bots</div>
                 </div>
             </div>
         </div>
@@ -84,9 +511,13 @@
         const container = document.getElementById('alertContainer');
         const alert = document.createElement('div');
         alert.className = 'alert ' + type;
-        alert.innerHTML = message;
+        alert.innerHTML = '<i class="bx bx-' + (type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info-circle') + '"></i> ' + message;
         container.appendChild(alert);
-        setTimeout(() => alert.remove(), 5000);
+        setTimeout(() => {
+            alert.style.opacity = '0';
+            alert.style.transform = 'translateY(-10px)';
+            setTimeout(() => alert.remove(), 300);
+        }, 5000);
     }
     
     async function loadBotsList() {
@@ -97,29 +528,42 @@
             
             if (data.success) {
                 if (data.data.length > 0) {
-                    list.innerHTML = data.data.map(function(bot) {
-                        return '<div class="bot-item" style="padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">' +
-                            '<div>' +
-                            '<strong>' + (bot.name || 'Bot ' + bot.id) + '</strong> ' +
-                            (bot.username ? '<span style="color: #6b7280;">@' + bot.username + '</span>' : '') +
-                            '<div style="font-size: 12px; color: #6b7280; margin-top: 4px;">ID: ' + bot.id + ' | Status: <span style="color: ' + (bot.status === 'running' ? '#059669' : '#ef4444') + ';">' + bot.status + '</span></div>' +
-                            '</div>' +
-                            '<div style="display: flex; gap: 8px;">' +
-                            (bot.status === 'running' ? 
-                                '<button class="btn" onclick="stopBot(\'' + bot.id + '\')" style="background: #ef4444; padding: 6px 12px; font-size: 12px;"><i class="bx bx-stop"></i> Dừng</button>' :
-                                '<button class="btn success" onclick="startBot(\'' + bot.id + '\')" style="padding: 6px 12px; font-size: 12px;"><i class="bx bx-play"></i> Chạy</button>') +
-                            '<button class="btn" onclick="deleteBot(\'' + bot.id + '\')" style="background: #6b7280; padding: 6px 12px; font-size: 12px;"><i class="bx bx-trash"></i> Xóa</button>' +
-                            '</div>' +
-                            '</div>';
-                    }).join('');
+                    list.innerHTML = '<div class="bots-grid">' +
+                        data.data.map(function(bot) {
+                            return '<div class="bot-card">' +
+                                '<div class="bot-card-header">' +
+                                '<div class="bot-name">' +
+                                '<i class="bx bx-bot"></i>' +
+                                '<span>' + (bot.name || 'Bot ' + bot.id) + '</span>' +
+                                '</div>' +
+                                '<span class="bot-status ' + bot.status + '">' + bot.status + '</span>' +
+                                '</div>' +
+                                '<div class="bot-info">' +
+                                (bot.username ? '<div class="bot-info-item"><i class="bx bx-at"></i>@' + bot.username + '</div>' : '') +
+                                '<div class="bot-info-item"><i class="bx bx-hash"></i>ID: ' + bot.id + '</div>' +
+                                '<div class="bot-info-item"><i class="bx bx-calendar"></i>Tạo: ' + new Date(bot.createdAt).toLocaleDateString('vi-VN') + '</div>' +
+                                '</div>' +
+                                '<div class="bot-actions">' +
+                                (bot.status === 'running' ? 
+                                    '<button class="btn btn-sm btn-stop" onclick="stopBot(\'' + bot.id + '\')"><i class="bx bx-stop"></i> Dừng</button>' :
+                                    '<button class="btn btn-sm btn-success" onclick="startBot(\'' + bot.id + '\')"><i class="bx bx-play"></i> Chạy</button>') +
+                                '<button class="btn btn-sm btn-danger" onclick="deleteBot(\'' + bot.id + '\')"><i class="bx bx-trash"></i> Xóa</button>' +
+                                '</div>' +
+                                '</div>';
+                        }).join('') +
+                        '</div>';
                 } else {
-                    list.innerHTML = '<p style="color: #6b7280;">Chưa có bot nào. Tạo bot đầu tiên ở trên!</p>';
+                    list.innerHTML = '<div class="empty-state">' +
+                        '<i class="bx bx-bot"></i>' +
+                        '<h3>Chưa có bot nào</h3>' +
+                        '<p>Bắt đầu bằng cách tạo bot đầu tiên của bạn ở trên!</p>' +
+                        '</div>';
                 }
             } else {
-                list.innerHTML = '<p class="error">Lỗi: ' + data.error + '</p>';
+                list.innerHTML = '<div class="alert error"><i class="bx bx-error-circle"></i> Lỗi: ' + data.error + '</div>';
             }
         } catch (error) {
-            list.innerHTML = '<p class="error">Lỗi khi tải danh sách bots</p>';
+            list.innerHTML = '<div class="alert error"><i class="bx bx-error-circle"></i> Lỗi khi tải danh sách bots</div>';
             console.error(error);
         }
     }
@@ -137,7 +581,7 @@
         
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="bx bx-loader-alt" style="animation: spin 1s linear infinite;"></i> Đang tạo...';
+        submitBtn.innerHTML = '<i class="bx bx-loader-alt spinner"></i> Đang tạo...';
         
         try {
             const res = await fetch('/api/bots/create', {
@@ -149,14 +593,14 @@
             const data = await res.json();
             
             if (data.success) {
-                showAlert('✅ Tạo bot thành công!', 'success');
+                showAlert('Tạo bot thành công!', 'success');
                 document.getElementById('createBotForm').reset();
                 loadBotsList();
             } else {
-                showAlert('❌ Lỗi: ' + data.error, 'error');
+                showAlert('Lỗi: ' + data.error, 'error');
             }
         } catch (error) {
-            showAlert('❌ Lỗi khi tạo bot: ' + error.message, 'error');
+            showAlert('Lỗi khi tạo bot: ' + error.message, 'error');
         } finally {
             submitBtn.disabled = false;
             submitBtn.innerHTML = '<i class="bx bx-plus"></i> Tạo Bot';
@@ -168,13 +612,13 @@
             const res = await fetch('/api/bots/' + botId + '/start', { method: 'POST' });
             const data = await res.json();
             if (data.success) {
-                showAlert('✅ Bot đã khởi động', 'success');
+                showAlert('Bot đã khởi động thành công', 'success');
                 loadBotsList();
             } else {
-                showAlert('❌ Lỗi: ' + data.error, 'error');
+                showAlert('Lỗi: ' + data.error, 'error');
             }
         } catch (error) {
-            showAlert('❌ Lỗi: ' + error.message, 'error');
+            showAlert('Lỗi: ' + error.message, 'error');
         }
     }
     
@@ -183,33 +627,32 @@
             const res = await fetch('/api/bots/' + botId + '/stop', { method: 'POST' });
             const data = await res.json();
             if (data.success) {
-                showAlert('✅ Bot đã dừng', 'success');
+                showAlert('Bot đã dừng thành công', 'success');
                 loadBotsList();
             } else {
-                showAlert('❌ Lỗi: ' + data.error, 'error');
+                showAlert('Lỗi: ' + data.error, 'error');
             }
         } catch (error) {
-            showAlert('❌ Lỗi: ' + error.message, 'error');
+            showAlert('Lỗi: ' + error.message, 'error');
         }
     }
     
     async function deleteBot(botId) {
-        if (!confirm('Bạn có chắc muốn xóa bot này?')) return;
+        if (!confirm('Bạn có chắc muốn xóa bot này? Hành động này không thể hoàn tác.')) return;
         
         try {
             const res = await fetch('/api/bots/' + botId + '/delete', { method: 'DELETE' });
             const data = await res.json();
             if (data.success) {
-                showAlert('✅ Bot đã bị xóa', 'success');
+                showAlert('Bot đã bị xóa thành công', 'success');
                 loadBotsList();
             } else {
-                showAlert('❌ Lỗi: ' + data.error, 'error');
+                showAlert('Lỗi: ' + data.error, 'error');
             }
         } catch (error) {
-            showAlert('❌ Lỗi: ' + error.message, 'error');
+            showAlert('Lỗi: ' + error.message, 'error');
         }
     }
     </script>
 </body>
 </html>
-
