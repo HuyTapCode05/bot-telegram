@@ -26,6 +26,17 @@
             <li><a href="/create-bot" class="nav-link <%= (typeof active !== 'undefined' && active === 'create-bot') ? 'active' : '' %>">
                 <i class='bx bx-plus-circle'></i> Tạo Bot
             </a></li>
+            <li style="margin-left:auto; display:flex; align-items:center; gap:10px; padding-left: 8px;">
+                <span style="color:#6b7280; font-size: 12px; white-space:nowrap;">
+                    <i class='bx bx-user'></i>
+                    <%= (typeof user !== 'undefined' && user && user.id) ? user.id : 'admin' %>
+                </span>
+                <form method="POST" action="/logout" style="display:inline;">
+                    <button type="submit" class="nav-link" style="border:0; background:transparent; cursor:pointer;">
+                        <i class='bx bx-log-out'></i> Logout
+                    </button>
+                </form>
+            </li>
         </ul>
     </div>
 </nav>

@@ -2,6 +2,8 @@ const express = require('express');
 const path = require('path');
 const session = require('express-session');
 const fs = require('fs');
+const http = require('http');
+const { Server } = require('socket.io');
 
 // Try to load bot, but handle errors gracefully
 let bot = null;
@@ -25,6 +27,27 @@ try {
 
 const app = express();
 const PORT = process.env.WEB_PORT || 3000;
+let io = null;
+
+function emitBotsUpdate() {
+  try {
+    if (io) io.emit('bots:update');
+  } catch (e) {
+    // ignore
+  }
+}
+
+function attachRealtime(server) {
+  io = new Server(server, {
+    cors: { origin: true, credentials: true }
+  });
+
+  io.on('connection', (socket) => {
+    socket.emit('bots:update');
+  });
+
+  return io;
+}
 
 // Session middleware
 app.use(session({
@@ -53,14 +76,55 @@ app.use(express.urlencoded({ extended: true }));
 
 // Simple auth middleware (có thể nâng cấp sau)
 function requireAuth(req, res, next) {
-  // Tạm thời cho phép tất cả, có thể thêm authentication sau
-  if (!req.session.userId) {
-    req.session.userId = 'admin'; // Demo
-  }
-  next();
+  if (req.session && req.session.userId) return next();
+  // lưu lại url để login xong quay về
+  try {
+    req.session.redirectTo = req.originalUrl || '/';
+  } catch {}
+  return res.redirect('/login');
 }
 
 // Routes
+app.get('/login', async (req, res) => {
+  res.render('login', {
+    title: 'Đăng nhập',
+    error: null
+  });
+});
+
+app.post('/login', async (req, res) => {
+  try {
+    const username = String(req.body?.username || '').trim();
+    const password = String(req.body?.password || '').trim();
+
+    const adminUser = String(process.env.ADMIN_USER || 'admin');
+    const adminPass = String(process.env.ADMIN_PASS || 'admin');
+
+    if (!username || !password) {
+      return res.status(400).render('login', { title: 'Đăng nhập', error: 'Vui lòng nhập đầy đủ tài khoản và mật khẩu.' });
+    }
+
+    if (username !== adminUser || password !== adminPass) {
+      return res.status(401).render('login', { title: 'Đăng nhập', error: 'Sai tài khoản hoặc mật khẩu.' });
+    }
+
+    req.session.userId = username;
+    const redirectTo = req.session.redirectTo || '/';
+    delete req.session.redirectTo;
+    return res.redirect(redirectTo);
+  } catch (error) {
+    return res.status(500).render('login', { title: 'Đăng nhập', error: error.message || 'Lỗi không xác định' });
+  }
+});
+
+app.post('/logout', requireAuth, async (req, res) => {
+  try {
+    req.session.destroy(() => res.redirect('/login'));
+  } catch {
+    res.redirect('/login');
+  }
+});
+
 app.get('/', requireAuth, async (req, res) => {
   try {
     let botInfo = null;
@@ -90,20 +154,23 @@ app.get('/manage-bot', requireAuth, async (req, res) => {
     }
     res.render('manage-bot', {
       title: 'Quản lý Bot',
-      botInfo
+      botInfo,
+      user: { id: req.session.userId }
     });
   } catch (error) {
     res.render('manage-bot', {
       title: 'Quản lý Bot',
       botInfo: null,
-      error: error.message
+      error: error.message,
+      user: { id: req.session.userId }
     });
   }
 });
 
 app.get('/groups', requireAuth, async (req, res) => {
   res.render('groups', {
-    title: 'Quản lý Nhóm'
+    title: 'Quản lý Nhóm',
+    user: { id: req.session.userId }
   });
 });
 
@@ -158,13 +225,15 @@ app.get('/commands', requireAuth, async (req, res) => {
   
   res.render('commands', {
     title: 'Quản lý Commands',
-    commands
+    commands,
+    user: { id: req.session.userId }
   });
 });
 
 app.get('/logs', requireAuth, async (req, res) => {
   res.render('logs', {
-    title: 'Xem Logs'
+    title: 'Xem Logs',
+    user: { id: req.session.userId }
   });
 });
 
@@ -172,13 +241,15 @@ app.get('/settings', requireAuth, async (req, res) => {
   res.render('settings', {
     title: 'Cài đặt',
     nodeVersion: process.version,
-    platform: process.platform
+    platform: process.platform,
+    user: { id: req.session.userId }
   });
 });
 
 app.get('/create-bot', requireAuth, async (req, res) => {
   res.render('create-bot', {
-    title: 'Tạo Bot'
+    title: 'Tạo Bot',
+    user: { id: req.session.userId }
   });
 });
 
@@ -352,6 +423,7 @@ app.post('/api/bots/create', requireAuth, async (req, res) => {
     }
     
     const botData = await botManager.addBot(token, name);
+    emitBotsUpdate();
     res.json({ success: true, data: botData, message: 'Bot đã được tạo thành công' });
   } catch (error) {
     res.json({ success: false, error: error.message });
@@ -365,6 +437,7 @@ app.post('/api/bots/:botId/start', requireAuth, async (req, res) => {
     }
     const { botId } = req.params;
     const result = await botManager.startBot(botId);
+    emitBotsUpdate();
     res.json(result);
   } catch (error) {
     res.json({ success: false, error: error.message });
@@ -378,6 +451,7 @@ app.post('/api/bots/:botId/stop', requireAuth, async (req, res) => {
     }
     const { botId } = req.params;
     const result = await botManager.stopBot(botId);
+    emitBotsUpdate();
     res.json(result);
   } catch (error) {
     res.json({ success: false, error: error.message });
@@ -391,18 +465,21 @@ app.delete('/api/bots/:botId/delete', requireAuth, async (req, res) => {
     }
     const { botId } = req.params;
     const result = await botManager.deleteBot(botId);
+    emitBotsUpdate();
     res.json(result);
   } catch (error) {
     res.json({ success: false, error: error.message });
   }
 });
 
-// Start server
+// Start server (when running standalone)
 if (require.main === module) {
-  app.listen(PORT, () => {
+  const server = http.createServer(app);
+  attachRealtime(server);
+  server.listen(PORT, () => {
     console.log(`🌐 Website quản lý bot đang chạy tại: http://localhost:${PORT}`);
   });
 }
 
-module.exports = app;
+module.exports = { app, attachRealtime };
 

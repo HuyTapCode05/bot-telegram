@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || 'Đăng nhập' %> - Telegram Bot Manager</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .auth-wrap {
+            min-height: calc(100vh - 0px);
+            display: grid;
+            place-items: center;
+            padding: 32px 16px;
+            background:
+              radial-gradient(1200px 600px at 10% 10%, rgba(59,130,246,.18), transparent 55%),
+              radial-gradient(900px 500px at 90% 20%, rgba(124,58,237,.14), transparent 60%),
+              #f5f7fa;
+        }
+        .auth-card {
+            width: 100%;
+            max-width: 460px;
+            background: rgba(255,255,255,.9);
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.12);
+            padding: 22px;
+            backdrop-filter: blur(8px);
+        }
+        .auth-brand {
+            display:flex; align-items:center; gap:10px;
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 6px;
+            color:#111827;
+        }
+        .auth-brand i { color:#3b82f6; font-size: 22px; }
+        .auth-sub { color:#6b7280; font-size: 13px; margin-bottom: 16px; }
+        .auth-title { font-size: 20px; font-weight: 700; margin: 14px 0 10px; color:#111827; }
+        .auth-form { display:flex; flex-direction: column; gap: 12px; }
+        .auth-field label { display:block; font-weight: 600; color:#374151; font-size: 13px; margin-bottom: 6px; }
+        .auth-input {
+            width:100%;
+            padding: 12px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background:#fff;
+            font-size: 14px;
+            transition: .2s ease;
+        }
+        .auth-input:focus { outline:none; border-color:#3b82f6; box-shadow: 0 0 0 4px rgba(59,130,246,.12); }
+        .auth-btn {
+            width:100%;
+            padding: 12px 14px;
+            border:0;
+            border-radius: 12px;
+            cursor:pointer;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3b82f6, #7c3aed);
+            color:#fff;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap: 8px;
+            transition:.2s ease;
+            box-shadow: 0 12px 26px rgba(59,130,246,.25);
+        }
+        .auth-btn:hover { transform: translateY(-1px); box-shadow: 0 16px 32px rgba(59,130,246,.28); }
+        .auth-error {
+            background:#fee2e2;
+            border:1px solid #fecaca;
+            color:#991b1b;
+            padding: 10px 12px;
+            border-radius: 12px;
+            display:flex;
+            align-items:flex-start;
+            gap: 10px;
+            font-size: 13px;
+        }
+        .auth-error i { font-size: 18px; margin-top: 1px; }
+        .auth-foot {
+            margin-top: 14px;
+            color:#6b7280;
+            font-size: 12px;
+            display:flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .auth-foot code { background:#f3f4f6; padding: 2px 6px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class="auth-wrap">
+        <div class="auth-card">
+            <div class="auth-brand">
+                <i class='bx bx-bot'></i>
+                <span>Telegram Bot Manager</span>
+            </div>
+            <div class="auth-sub">Quản lý bot, nhóm, commands, logs — realtime</div>
+
+            <div class="auth-title">Đăng nhập</div>
+
+            <% if (error) { %>
+            <div class="auth-error">
+                <i class='bx bx-error-circle'></i>
+                <div><%= error %></div>
+            </div>
+            <% } %>
+
+            <form class="auth-form" method="POST" action="/login">
+                <div class="auth-field">
+                    <label>Tài khoản</label>
+                    <input class="auth-input" type="text" name="username" placeholder="admin" autocomplete="username" />
+                </div>
+                <div class="auth-field">
+                    <label>Mật khẩu</label>
+                    <input class="auth-input" type="password" name="password" placeholder="••••••••" autocomplete="current-password" />
+                </div>
+                <button class="auth-btn" type="submit">
+                    <i class='bx bx-log-in'></i>
+                    Đăng nhập
+                </button>
+            </form>
+
+            <div class="auth-foot">
+                <div>ENV: <code>ADMIN_USER</code>, <code>ADMIN_PASS</code></div>
+                <div>Mặc định: <code>admin/admin</code></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+

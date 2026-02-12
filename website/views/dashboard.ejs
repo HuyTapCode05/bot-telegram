@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <%- include('partials/navbar', { active: 'dashboard' }) %>
+    <%- include('partials/navbar', { active: 'dashboard', user: (typeof user !== 'undefined' ? user : null) }) %>
 
     <main class="main-content">
         <div class="dashboard">
@@ -119,6 +119,7 @@
     </main>
 
     <script src="/js/common.js"></script>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', async function() {
         try {
@@ -157,6 +158,16 @@
         
         // Load bots list
         loadBotsList();
+
+        // Realtime updates
+        try {
+            const socket = io();
+            socket.on('bots:update', function() {
+                loadBotsList();
+            });
+        } catch (e) {
+            // ignore
+        }
     });
     
     async function loadBotsList() {

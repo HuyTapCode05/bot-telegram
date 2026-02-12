@@ -94,10 +94,17 @@ async function main() {
             console.warn("⚠️  Không thể khôi phục bot con:", error.message);
         }
 
-        // Always start website (auto-start)
-        const webApp = require('./website/app');
+        // Always start website (auto-start) + realtime (socket.io)
+        const http = require('http');
+        const web = require('./website/app');
         const PORT = process.env.WEB_PORT || 3000;
-        webApp.listen(PORT, () => {
+
+        const server = http.createServer(web.app || web);
+        if (web.attachRealtime) {
+            web.attachRealtime(server);
+        }
+
+        server.listen(PORT, () => {
             console.log(`🌐 Website quản lý bot đang chạy tại: http://localhost:${PORT}`);
             console.log(`📊 Truy cập: http://localhost:${PORT} để quản lý bot\n`);
         });

@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <%- include('partials/navbar', { active: 'groups' }) %>
+    <%- include('partials/navbar', { active: 'groups', user: (typeof user !== 'undefined' ? user : null) }) %>
     <main class="main-content">
         <div class="groups">
             <div class="page-header">

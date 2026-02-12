@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <%- include('partials/navbar', { active: 'manage-bot' }) %>
+    <%- include('partials/navbar', { active: 'manage-bot', user: (typeof user !== 'undefined' ? user : null) }) %>
     <main class="main-content">
         <div class="manage-bot">
             <div class="page-header">

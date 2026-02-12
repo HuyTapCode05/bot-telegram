@@ -411,7 +411,7 @@
     </style>
 </head>
 <body>
-    <%- include('partials/navbar', { active: 'create-bot' }) %>
+    <%- include('partials/navbar', { active: 'create-bot', user: (typeof user !== 'undefined' ? user : null) }) %>
     <main class="main-content">
         <div class="create-bot-page">
             <div class="page-header">
@@ -502,9 +502,19 @@
         </div>
     </main>
     <script src="/js/common.js"></script>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         loadBotsList();
+
+        try {
+            const socket = io();
+            socket.on('bots:update', function() {
+                loadBotsList();
+            });
+        } catch (e) {
+            // ignore if socket.io not available
+        }
     });
     
     function showAlert(message, type) {
